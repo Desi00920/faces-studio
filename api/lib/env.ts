@@ -1,0 +1,18 @@
+import "dotenv/config";
+
+function required(name: string): string {
+  const value = process.env[name];
+  if (!value && process.env.NODE_ENV === "production") {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value ?? "";
+}
+
+export const env = {
+  appId: required("APP_ID"),
+  appSecret: required("APP_SECRET"),
+  isProduction: process.env.NODE_ENV === "production",
+  databaseUrl: required("DATABASE_URL"),
+  googlePlacesApiKey: process.env.GOOGLE_PLACES_API_KEY ?? "",
+  googleMapsApiKey: process.env.VITE_GOOGLE_MAPS_API_KEY ?? "",
+};
