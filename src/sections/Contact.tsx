@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLang } from '../context/LanguageContext'
-import { trpc } from '@/providers/trpc'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -72,24 +71,6 @@ export default function Contact() {
   const [errorMsg, setErrorMsg] = useState('')
   const isDe = lang === 'de'
 
-  const sendMutation = trpc.contact.send.useMutation({
-    onSuccess: () => {
-      setStatus('success')
-      setFormData({ name: '', email: '', phone: '', service: '', addons: [], preferredDate: '', preferredTime: '', message: '' })
-    },
-    onError: (err) => {
-      setStatus('error')
-      const msg = err.message || ''
-      if (msg.includes('fetch') || msg.includes('network') || msg.includes('timeout') || msg.includes('Failed to fetch')) {
-        setErrorMsg(isDe
-          ? 'Verbindungsfehler. Bitte versuche es später erneut oder kontaktiere uns per WhatsApp.'
-          : 'Connection error. Please try again later or contact us via WhatsApp.')
-      } else {
-        setErrorMsg(msg)
-      }
-    },
-  })
-
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from(leftRef.current, { x: -30, opacity: 0, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: sectionRef.current, start: 'top 70%', toggleActions: 'play none none none' } })
@@ -98,11 +79,49 @@ export default function Contact() {
     return () => ctx.revert()
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.email || !formData.message) return
+
     setStatus('loading')
-    sendMutation.mutate(formData)
+    setErrorMsg('')
+
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), 10000)
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(formData),
+        signal: controller.signal,
+      })
+
+      const contentType = response.headers.get('content-type') || ''
+      const payload = contentType.includes('application/json')
+        ? await response.json()
+        : { success: false, error: await response.text() }
+
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error || payload.message || 'Failed to send inquiry')
+      }
+
+      setStatus('success')
+      setFormData({ name: '', email: '', phone: '', service: '', addons: [], preferredDate: '', preferredTime: '', message: '' })
+    } catch (err) {
+      setStatus('error')
+      const msg = err instanceof Error ? err.message : ''
+      if (msg.includes('fetch') || msg.includes('network') || msg.includes('timeout') || msg.includes('Failed to fetch') || msg.includes('aborted')) {
+        setErrorMsg(isDe
+          ? 'Verbindungsfehler. Bitte versuche es später erneut oder kontaktiere uns per WhatsApp.'
+          : 'Connection error. Please try again later or contact us via WhatsApp.')
+      } else {
+        setErrorMsg(msg)
+      }
+    } finally {
+      window.clearTimeout(timeout)
+    }
   }
 
   const inputStyle: React.CSSProperties = {

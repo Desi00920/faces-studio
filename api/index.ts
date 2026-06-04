@@ -36,7 +36,7 @@ app.post("/api/contact", async (c) => {
       "lash-tint": "Wimpern färben (CHF 35.–)",
       "brow-tint": "Brauen färben (CHF 25.–)",
       "brow-shape": "Brauen zupfen (CHF 25.–)",
-      "lip-wax": "Oberlippe wachsen (CHF 25.–)",
+      "lip-wax": "Oberlippe wachsen (CHF 15.–)",
     };
     const addonsText = addons?.length
       ? addons.map((a) => addonNames[a] || a).join("\n  - ")
@@ -76,9 +76,10 @@ export default async function handler(req: any, res: any) {
   const url = `${protocol}://${host}${req.url}`;
   const headers = new Headers();
   for (const [k, v] of Object.entries(req.headers)) {
-    if (v === undefined) continue;
+    if (v == null) continue;
     if (Array.isArray(v)) for (const x of v) headers.append(k, x);
-    else headers.set(k, v);
+    else if (typeof v === "string") headers.set(k, v);
+    else headers.set(k, String(v));
   }
   let body: string | undefined;
   if (req.method !== "GET" && req.method !== "HEAD" && req.body) {
