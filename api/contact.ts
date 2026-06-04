@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createRouter, publicQuery } from "./middleware.js";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || "missing");
 
 export const contactRouter = createRouter({
   send: publicQuery
@@ -20,6 +20,9 @@ export const contactRouter = createRouter({
     )
     .mutation(async ({ input }) => {
       try {
+        if (!process.env.RESEND_API_KEY) {
+          return { success: false, error: "Contact form not configured — missing API key" };
+        }
       const { name, email, phone, service, addons, preferredDate, preferredTime, message } = input;
 
       const addonNames: Record<string, string> = {

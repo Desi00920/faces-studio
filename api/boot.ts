@@ -9,6 +9,7 @@ import { env } from "./lib/env.js";
 const app = new Hono<{ Bindings: HttpBindings }>();
 
 app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
+app.get("/api/ping", (c) => c.json({ ok: true, ts: Date.now() }));
 app.use("/api/trpc/*", async (c) => {
   return fetchRequestHandler({
     endpoint: "/api/trpc",
