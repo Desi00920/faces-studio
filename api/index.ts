@@ -7,18 +7,33 @@ const app = new Hono();
 app.get("/api/ping", (c) => c.json({ ok: true, ts: Date.now() }));
 
 // Diagnostic — confirms env var status without sending email
+// Lists all env vars whose names contain RESEND, DATABASE, or KEY
+// to help debug env var issues.
 app.get("/api/diag", (c) => {
-  const apiKey = process.env.RESEND_API_KEY || "";
-  const dbUrl = process.env.DATABASE_URL || "";
+  const allEnv = process.env;
+  const matchingKeys: Record<string, { set: boolean; prefix: string; length: number }> = {};
+  for (const [k, v] of Object.entries(allEnv)) {
+    const upper = k.toUpperCase();
+    if (upper.includes("RESEND") || upper.includes("DATABASE") || upper.includes("DB_URL")) {
+      const val = v || "";
+      matchingKeys[k] = {
+        set: !!val,
+        prefix: val ? val.slice(0, 8) : "",
+        length: val.length,
+      };
+    }
+  }
   return c.json({
-    resend_api_key_set: !!apiKey,
-    resend_api_key_prefix: apiKey ? apiKey.slice(0, 6) : null,
-    resend_api_key_length: apiKey.length,
-    database_url_set: !!dbUrl,
-    database_url_prefix: dbUrl ? dbUrl.slice(0, 12) : null,
+    resend_api_key_set: !!process.env.RESEND_API_KEY,
+    resend_api_key_prefix: process.env.RESEND_API_KEY ? process.env.RESEND_API_KEY.slice(0, 6) : null,
+    resend_api_key_length: (process.env.RESEND_API_KEY || "").length,
+    database_url_set: !!process.env.DATABASE_URL,
+    database_url_prefix: process.env.DATABASE_URL ? process.env.DATABASE_URL.slice(0, 12) : null,
     node_env: process.env.NODE_ENV || "unknown",
     vercel_env: process.env.VERCEL_ENV || "unknown",
     vercel_region: process.env.VERCEL_REGION || "unknown",
+    vercel_git_commit_sha: process.env.VERCEL_GIT_COMMIT_SHA || "unknown",
+    matching_env_vars: matchingKeys,
     timestamp: new Date().toISOString(),
   });
 });
