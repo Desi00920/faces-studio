@@ -37,7 +37,7 @@ export const contactRouter = createRouter({
         : "None";
 
       const { data, error } = await resend.emails.send({
-        from: "Faces Studio <hello@faces-studio.ch>",
+        from: "Faces Studio <onboarding@resend.dev>",
         to: ["hello@faces-studio.ch"],
         replyTo: email,
         subject: `\ud83d\udcde Neue Terminanfrage von ${name}`,
