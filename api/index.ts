@@ -43,7 +43,7 @@ app.post("/api/contact", async (c) => {
       : "None";
 
     const { data, error } = await resend.emails.send({
-      from: "Faces Studio <onboarding@resend.dev>",
+      from: "Faces Studio <hello@faces-studio.ch>",
       to: ["hello@faces-studio.ch"],
       replyTo: email,
       subject: `Neue Terminanfrage von ${name}`,

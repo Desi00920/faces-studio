@@ -100,7 +100,7 @@ export default function GoogleMap() {
               : '1st Floor, Reinhardstrasse 12, 8008 Zurich'}
           </p>
           <a
-            href="https://www.google.com/maps/place/Faces+Studio/@47.3627763,8.5512386,17z"
+            href="https://www.google.com/maps/place/Faces+Studio/@47.3627799,8.5486637,16z/data=!3m1!4b1!4m6!3m5!1s0x479aa704dc10a87f:0x4ec88149d3d3ecc2!8m2!3d47.3627763!4d8.5512386!16s%2Fg%2F11z83p8gkm?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
             target="_blank"
             rel="noopener noreferrer"
             style={{
