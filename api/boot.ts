@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import type { HttpBindings } from "@hono/node-server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { Resend } from "resend";
 import { z } from "zod";
 import { appRouter } from "./router.js";
 import { createContext } from "./context.js";
@@ -25,15 +24,11 @@ app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
 app.get("/api/ping", (c) => c.json({ ok: true, ts: Date.now() }));
 app.post("/api/contact", async (c) => {
   try {
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) return c.json({ success: false, error: "Contact form not configured" }, 500);
-
     const body = await c.req.json();
     const parsed = contactSchema.safeParse(body);
     if (!parsed.success) return c.json({ success: false, error: "Invalid input" }, 400);
 
     const { name, email, phone, service, addons, preferredDate, preferredTime, message } = parsed.data;
-    const resend = new Resend(apiKey);
 
     const addonNames: Record<string, string> = {
       "lash-tint": "Wimpern färben (CHF 35.–)",
@@ -45,25 +40,33 @@ app.post("/api/contact", async (c) => {
       ? addons.map((a) => addonNames[a] || a).join("\n  - ")
       : "None";
 
-    const { data, error } = await resend.emails.send({
-      from: "Faces Studio <hello@faces-studio.ch>",
-      to: ["hello@faces-studio.ch"],
-      replyTo: email,
-      subject: `Neue Terminanfrage von ${name}`,
-      text: [
-        `NEUE TERMINANFRAGE — FACES STUDIO`,
-        `Name: ${name}`,
-        `E-Mail: ${email}`,
-        `Telefon: ${phone}`,
-        `Service: ${service || "-"}`,
-        `Add-ons: ${addonsText}`,
-        `Wunschtermin: ${preferredDate || "-"} ${preferredTime || "-"}`,
-        `Nachricht: ${message}`,
-      ].join("\n"),
+    const formData = new URLSearchParams();
+    formData.append("_subject", `Neue Terminanfrage von ${name}`);
+    formData.append("_replyto", email);
+    formData.append("_template", "box");
+    formData.append("Name", name);
+    formData.append("E-Mail", email);
+    formData.append("Telefon", phone);
+    formData.append("Service", service || "-");
+    formData.append("Add-ons", addonsText);
+    formData.append("Wunschtermin", `${preferredDate || "-"} ${preferredTime || "-"}`.trim());
+    formData.append("Nachricht", message);
+
+    const fsResponse = await fetch("https://formsubmit.co/ajax/hello@faces-studio.ch", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+      },
+      body: formData.toString(),
     });
 
-    if (error) return c.json({ success: false, error: error.message }, 500);
-    return c.json({ success: true, id: data?.id });
+    if (!fsResponse.ok) {
+      const errText = await fsResponse.text();
+      return c.json({ success: false, error: `FormSubmit returned ${fsResponse.status}: ${errText.slice(0, 200)}` }, 500);
+    }
+    const result: any = await fsResponse.json();
+    return c.json({ success: true, id: result?.id || "formsubmit-ok" });
   } catch (err: any) {
     return c.json({ success: false, error: err.message || "Internal error" }, 500);
   }
