@@ -91,6 +91,7 @@ app.post("/api/contact", async (c) => {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json",
+        "User-Agent": "Mozilla/5.0 (compatible; FacesStudioContact/1.0; +https://faces-studio.ch)",
       },
       body: formData.toString(),
     });
