@@ -6,6 +6,25 @@ const app = new Hono();
 // Health check
 app.get("/api/ping", (c) => c.json({ ok: true, ts: Date.now() }));
 
+// Diagnostic — confirms env var status without sending email
+app.get("/api/diag", (c) => {
+  const apiKey = process.env.RESEND_API_KEY || "";
+  const dbUrl = process.env.DATABASE_URL || "";
+  return c.json({
+    resend_api_key_set: !!apiKey,
+    resend_api_key_prefix: apiKey ? apiKey.slice(0, 6) : null,
+    resend_api_key_length: apiKey.length,
+    database_url_set: !!dbUrl,
+    database_url_prefix: dbUrl ? dbUrl.slice(0, 12) : null,
+    node_env: process.env.NODE_ENV || "unknown",
+    vercel_env: process.env.VERCEL_ENV || "unknown",
+    vercel_region: process.env.VERCEL_REGION || "unknown",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+
+
 // Contact form
 import { z } from "zod";
 
