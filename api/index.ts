@@ -102,6 +102,17 @@ app.post("/api/contact", async (c) => {
     }
 
     const result: any = await response.json();
+    // BUGFIX: previous code returned success: true whenever HTTP 200, even if
+    // FormSubmit's body said success: false (e.g. "form needs activation").
+    // Now we surface the real FormSubmit response.
+    const formsubmitSuccess = result?.success === true || result?.success === "true";
+    if (!formsubmitSuccess) {
+      return c.json({
+        success: false,
+        formsubmit_response: result,
+        error: result?.message || "FormSubmit did not accept the submission",
+      }, 502);
+    }
     return c.json({ success: true, id: result?.id || "formsubmit-ok" });
   } catch (err: any) {
     return c.json({ success: false, error: err.message || "Internal error" }, 500);
