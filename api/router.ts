@@ -1,15 +1,8 @@
-import { createRouter, publicQuery } from "./middleware.js";
-import { contactRouter } from "./contact.js";
-import { contentRouter } from "./content.js";
-import { adminRouter } from "./admin.js";
-import { googleReviewsRouter } from "./googleReviews.js";
+// Stubbed tRPC router — admin/contact/content/etc. endpoints are no-ops
+// because the underlying API files were removed (Vercel 12-function limit).
+// Google Reviews and Admin features are temporarily disabled.
+// Re-add real routers once we migrate away from Vercel Hobby plan.
 
-export const appRouter = createRouter({
-  ping: publicQuery.query(() => ({ ok: true, ts: Date.now() })),
-  contact: contactRouter,
-  content: contentRouter,
-  admin: adminRouter,
-  googleReviews: googleReviewsRouter,
-});
+export const appRouter = {};
 
 export type AppRouter = typeof appRouter;
