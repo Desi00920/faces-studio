@@ -81,7 +81,7 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.name || !formData.email || !formData.message) return
+    if (!formData.name || !formData.email) return
 
     setStatus('loading')
     setErrorMsg('')
@@ -299,7 +299,7 @@ export default function Contact() {
             </div>
 
             {/* Message */}
-            <textarea placeholder={isDe ? 'Nachricht *' : 'Message *'} rows={3} required value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} onFocus={(e) => { e.target.style.borderBottomColor = '#1a1a1a' }} onBlur={(e) => { e.target.style.borderBottomColor = '#d4d0c9' }} />
+            <textarea placeholder={isDe ? 'Nachricht (optional)' : 'Message (optional)'} rows={3} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} onFocus={(e) => { e.target.style.borderBottomColor = '#1a1a1a' }} onBlur={(e) => { e.target.style.borderBottomColor = '#d4d0c9' }} />
 
             {/* Non-binding notice */}
             <div style={{ backgroundColor: 'rgba(255, 87, 87, 0.08)', borderRadius: '14px', padding: '18px 20px', border: '1.5px solid rgba(255, 87, 87, 0.2)' }}>

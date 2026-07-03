@@ -22,13 +22,15 @@ interface TreatmentData {
   bulletsEn: string[]
   noteDe?: string
   noteEn?: string
+  specialDe?: string
+  specialEn?: string
 }
 
 const TREATMENTS: TreatmentData[] = [
   {
     id: 'bio-microneedling',
     image: '/images/bio-microneedling.jpg',
-    comingSoon: true,
+    comingSoon: false,
     durationDe: '60 Minuten',
     durationEn: '60 Minutes',
     price: 'CHF 205.–',
@@ -115,6 +117,8 @@ const TREATMENTS: TreatmentData[] = [
     titleEn: 'The Hydra Renewal',
     subtitleDe: 'Für zeitlose Ausstrahlung & sichtbar gestraffte Haut',
     subtitleEn: 'Timeless Radiance & Visibly Lifted Skin',
+    specialDe: 'Spezial: hochwertige Alginat Maske',
+    specialEn: 'Spezial: hochwertige Alginat Maske',
     descDe: 'Diese revitalisierende Premium-Behandlung ist auf Kollagenstimulation, Lifting und tiefen Glow ausgerichtet – ganz ohne invasive Eingriffe. Nach Reinigung und Peeling wird ein hochwirksames Serum via Gua-Sha-Massage in Gesicht und Dekolleté eingearbeitet. Eine reichhaltige Anti-Aging-Maske und entspannende Kopfmassage runden das Erlebnis ab. Abschlusspflege.',
     descEn: "This revitalizing premium treatment is all about collagen stimulation, lifting, and deep hydration glow — completely non-invasive. After cleansing and exfoliation, a potent serum is massaged into your face and décolleté using Gua Sha technique. A rich anti-aging mask and relaxing scalp massage complete the experience. Finishing care. Think of it as a gym session for your face — toned, lifted, and absolutely glowing.",
     bulletsDe: [
@@ -272,6 +276,20 @@ function TreatmentCard({ t, index }: { t: TreatmentData; index: number }) {
           <p style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 400, fontStyle: 'italic', color: mutedColor, margin: '0 0 20px' }}>
             {isDe ? t.subtitleDe : t.subtitleEn}
           </p>
+
+          {(t.specialDe || t.specialEn) && (
+            <p style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '17px',
+              fontWeight: 700,
+              fontStyle: 'italic',
+              color: '#000000',
+              margin: '0 0 20px',
+              letterSpacing: '0.01em',
+            }}>
+              {isDe ? t.specialDe : t.specialEn}
+            </p>
+          )}
 
           <p style={{ fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 400, color: textColor, lineHeight: 1.65, margin: '0 0 18px' }}>
             {isDe ? t.descDe : t.descEn}
