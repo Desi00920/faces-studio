@@ -168,7 +168,7 @@ export default function Contact() {
             <img
               src="/faces_logo2.png"
               alt="Faces Studio Logo"
-              style={{ display: 'block', margin: '20px auto 0', maxWidth: '200px', height: 'auto', width: '100%' }}
+              style={{ display: 'block', margin: '20px 0 0 0', maxWidth: '200px', height: 'auto', width: '100%' }}
             />
           </div>
         </div>
