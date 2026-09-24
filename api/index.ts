@@ -51,7 +51,7 @@ const contactSchema = z.object({
   addons: z.array(z.string()).optional(),
   preferredDate: z.string().optional(),
   preferredTime: z.string().optional(),
-  message: z.string().min(1),
+  message: z.string().optional(),
 });
 
 app.post("/api/contact", async (c) => {
@@ -106,7 +106,7 @@ app.post("/api/contact", async (c) => {
           </table>
           <div style="margin-top: 24px; padding: 16px; background-color: #f6f3ee; border-radius: 8px;">
             <div style="color: #8c8c8c; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;">Nachricht</div>
-            <div style="white-space: pre-wrap; line-height: 1.6;">${escapeHtml(message)}</div>
+            <div style="white-space: pre-wrap; line-height: 1.6;">${escapeHtml(message || '')}</div>
           </div>
           <p style="margin-top: 24px; color: #8c8c8c; font-size: 12px;">Antworte direkt auf diese E-Mail, um ${escapeHtml(name)} zu erreichen.</p>
         </div>
